@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Cert Generator</title>
+</head>
+<body>
+    <div class="container">
+        <h2>Graduation Awards</h2>
+        <form action="/generate" method="POST">
+    <input type="text" name="student_name" placeholder="Full Name">
+    
+    <input type="text" name="position" placeholder="Position">
+    
+    <button type="submit">Generate Certificate</button>
+</form>
+    </div>
+</body>
+</html>
