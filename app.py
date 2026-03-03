@@ -30,8 +30,8 @@ def generate():
         try:
             # Name: Bold and Large (85)
             # Position: Bold and Large (70)
-            font_name = ImageFont.truetype("arial.ttf", 35)
-            font_pos = ImageFont.truetype("arial.ttf", 40) 
+            font_name = ImageFont.truetype("arial.ttf", 50)
+            font_pos = ImageFont.truetype("arial.ttf", 60) 
         except:
             font_name = font_pos = ImageFont.load_default()
 
