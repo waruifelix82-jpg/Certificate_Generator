@@ -30,8 +30,8 @@ def generate():
         try:
             # Name: Bold and Large (85)
             # Position: Bold and Large (70)
-            font_name = ImageFont.truetype("arial.ttf", 35)
-            font_pos = ImageFont.truetype("arial.ttf", 45) 
+            font_name = ImageFont.truetype("arial.ttf", 80)
+            font_pos = ImageFont.truetype("arial.ttf", 60) 
         except:
             font_name = font_pos = ImageFont.load_default()
 
@@ -39,7 +39,7 @@ def generate():
         center_x = W // 2
         
         # name_y: Adjusted to sit exactly on your template's red line
-        name_y = 270  
+        name_y = 245 
         
         # pos_y: Adjusted to sit in the blank space after "Position of"
         pos_y =350
