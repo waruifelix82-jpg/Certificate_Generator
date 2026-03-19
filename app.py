@@ -11,7 +11,6 @@ def home():
 
 @app.route("/generate", methods=["POST"])
 def generate():
-    # Now only getting the name
     name = request.form.get("student_name")
 
     if not name:
@@ -23,25 +22,29 @@ def generate():
         W, H = img.size
         draw = ImageDraw.Draw(img)
         
-        # 2. Dynamic Font Sizing
-        name_size = int(W * 0.06) 
+        # 2. INCREASED FONT SIZING
+        # Changed from 0.06 to 0.15 for much better visibility
+        name_size = int(W * 0.15) 
 
         try:
+            # Note: Ensure arial.ttf is in your project folder on Vercel
             font_name = ImageFont.truetype("arial.ttf", name_size)
         except:
+            # If font file is missing, this default is often very small
             font_name = ImageFont.load_default()
 
-        # 3. Dynamic Coordinates
+        # 3. ADJUSTED COORDINATES
         center_x = W // 2
-        name_y = int(H * 0.39) # Adjust this if the name is too high or low
+        # Moved from 0.39 to 0.42 to sit closer to the presentation line
+        name_y = int(H * 0.42) 
            
-        # 4. Draw Name Only
-        # Using the Navy Blue color (20, 40, 80)
-        draw.text((center_x, name_y), name.upper(), fill=(20, 40, 80), font=font_name, anchor="mm")
+        # 4. DRAW NAME
+        # Using a slightly darker Navy Blue (0, 32, 96) for professional look
+        draw.text((center_x, name_y), name.upper(), fill=(0, 32, 96), font=font_name, anchor="mm")
 
         # 5. Send to Browser
         img_io = io.BytesIO()
-        img.save(img_io, 'JPEG', quality=95)
+        img.save(img_io, 'JPEG', quality=100) # Max quality for deployment
         img_io.seek(0)
         
         return send_file(
