@@ -22,7 +22,7 @@ def generate():
         draw = ImageDraw.Draw(img)
         
         # 2. MASSIVE FONT SIZE (0.15 is roughly 15% of the image width)
-        name_size = int(W * 0.15) 
+        name_size = int(W * 0.04) 
 
         # 3. THE FONT SELECTOR (Vercel Compatibility)
         font_name = None
@@ -48,8 +48,8 @@ def generate():
         # 4. POSITIONING (Centered on the dotted line)
         center_x = W // 2
         # 0.44 puts it right above the signature/presentation line
-        name_y = int(H * 0.44) 
-           
+        name_y = int(H * 0.39) 
+        
         # 5. DRAW THE NAME
         # fill=(0, 51, 153) is a nice LUCU Blue
         draw.text((center_x, name_y), name.upper(), fill=(0, 51, 153), font=font_name, anchor="mm")
