@@ -36,7 +36,7 @@ def generate():
         # 3. ADJUSTED COORDINATES
         center_x = W // 2
         # Moved from 0.39 to 0.42 to sit closer to the presentation line
-        name_y = int(H * 0.42) 
+        name_y = int(H * 0.21) 
            
         # 4. DRAW NAME
         # Using a slightly darker Navy Blue (0, 32, 96) for professional look
