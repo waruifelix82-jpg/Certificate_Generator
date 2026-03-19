@@ -12,39 +12,51 @@ def home():
 @app.route("/generate", methods=["POST"])
 def generate():
     name = request.form.get("student_name")
-
     if not name:
         return "Error: Name is required!", 400
     
     try:
-        # 1. Load your template
+        # 1. Load your certificate template
         img = Image.open("certificate.jpg").convert("RGB")
         W, H = img.size
         draw = ImageDraw.Draw(img)
         
-        # 2. INCREASED FONT SIZING
-        # Changed from 0.06 to 0.15 for much better visibility
+        # 2. MASSIVE FONT SIZE (0.15 is roughly 15% of the image width)
         name_size = int(W * 0.15) 
 
-        try:
-            # Note: Ensure arial.ttf is in your project folder on Vercel
-            font_name = ImageFont.truetype("arial.ttf", name_size)
-        except:
-            # If font file is missing, this default is often very small
+        # 3. THE FONT SELECTOR (Vercel Compatibility)
+        font_name = None
+        # List of possible font paths (Local file first, then Linux system fonts)
+        font_paths = [
+            "arial.ttf", 
+            "Poppins-Bold.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+            "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf"
+        ]
+
+        for path in font_paths:
+            try:
+                font_name = ImageFont.truetype(path, name_size)
+                break # Stop if we find one that works!
+            except:
+                continue
+
+        if font_name is None:
             font_name = ImageFont.load_default()
+            print("Warning: No TTF font found. Text will be tiny.")
 
-        # 3. ADJUSTED COORDINATES
+        # 4. POSITIONING (Centered on the dotted line)
         center_x = W // 2
-        # Moved from 0.39 to 0.42 to sit closer to the presentation line
-        name_y = int(H * 0.21) 
+        # 0.44 puts it right above the signature/presentation line
+        name_y = int(H * 0.44) 
            
-        # 4. DRAW NAME
-        # Using a slightly darker Navy Blue (0, 32, 96) for professional look
-        draw.text((center_x, name_y), name.upper(), fill=(0, 32, 96), font=font_name, anchor="mm")
+        # 5. DRAW THE NAME
+        # fill=(0, 51, 153) is a nice LUCU Blue
+        draw.text((center_x, name_y), name.upper(), fill=(0, 51, 153), font=font_name, anchor="mm")
 
-        # 5. Send to Browser
+        # 6. Save and Send
         img_io = io.BytesIO()
-        img.save(img_io, 'JPEG', quality=100) # Max quality for deployment
+        img.save(img_io, 'JPEG', quality=100)
         img_io.seek(0)
         
         return send_file(
@@ -55,7 +67,7 @@ def generate():
         )
 
     except Exception as e:
-        return f"An error occurred: {e}", 500
+        return f"System Error: {e}", 500
 
 if __name__ == "__main__":
     app.run(debug=True)
