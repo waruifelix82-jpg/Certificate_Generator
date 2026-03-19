@@ -14,7 +14,7 @@
         <div class="header">
            <img src="{{ url_for('static', filename='logo.png') }}" alt="LUCU Logo" class="cu-logo">
             <h1>LUCU CLASS OF 2025/2026</h1>
-            <p>Enter details to preview and generate your certificate</p>
+            <p>Enter your details to generate your certificate</p>
         </div>
 
         <form action="/generate" method="POST" class="cert-form" id="mainForm">
@@ -23,14 +23,6 @@
                 <div class="inner-input">
                     <i class="fas fa-user"></i>
                     <input type="text" id="student_name" name="student_name" placeholder="Full Name" required>
-                </div>
-            </div>
-
-            <div class="input-group">
-                <label for="position">Award Title / Position</label>
-                <div class="inner-input">
-                    <i class="fas fa-award"></i>
-                    <input type="text" id="position" name="position" placeholder="e.g. Chairperson" required>
                 </div>
             </div>
 
@@ -51,10 +43,7 @@
                     <small>Full Name:</small>
                     <p id="previewName"></p>
                 </div>
-                <div class="preview-item">
-                    <small>Position/Award:</small>
-                    <p id="previewPosition"></p>
-                </div>
+                
                 <p class="notice">Please ensure the spelling is correct. Changes cannot be made after generation.</p>
             </div>
             <div class="modal-footer">
