@@ -40,7 +40,7 @@ def generate():
     # 2. CHECK IF ALREADY DOWNLOADED (Cookie Check)
     # This prevents the same device from downloading twice
     if request.cookies.get(f"done_{name.replace(' ', '_')}"):
-        flash("System Note: You have already downloaded the certificate.", "error")
+        flash("System Note: You have already downloaded the certificate.", "error")#error
         return redirect(url_for('home'))
 
     # 3. INTAKE RESTRICTION
