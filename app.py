@@ -54,7 +54,7 @@ def generate():
         W, H = img.size
         draw = ImageDraw.Draw(img)
         
-        # PRESERVING YOUR ORIGINAL MEASUREMENTS
+        # PRESERVING YOUR ORIGINAL MEASUREMENT
         name_size = int(W * 0.04) 
 
         font_name = None
