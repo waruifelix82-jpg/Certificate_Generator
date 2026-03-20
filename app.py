@@ -4,7 +4,7 @@ import io
 from PIL import Image, ImageDraw, ImageFont
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
-# Secret key is required to use flash messages
+# Secret key is required to use flash messages for the same-tab error
 app.secret_key = "lucu_secret_key_2026"
 
 @app.route("/")
@@ -20,12 +20,15 @@ def generate():
         flash("Error: Name and Admission Number are required!", "error")
         return redirect(url_for('home'))
     
-    # 2. INTAKE RESTRICTION (Only 2021 and 2022)
-    allowed_years = ["21", "22"]
-    if not any(year in adm_no for year in allowed_years):
-        # This sends the message back to your index.html
-        flash("Registration Error: This certificate is only for 21 and 22 intakes.", "error")
+    # --- UPDATED RESTRICTION LOGIC ---
+    # .strip() removes any accidental spaces the student might type at the end
+    clean_adm = adm_no.strip()
+    
+    # Check if the string specifically ENDS with 21 or 22
+    if not (clean_adm.endswith("21") or clean_adm.endswith("22")):
+        flash("Registration Error: This certificate is only for admission numbers ending in 21 or 22.", "error")
         return redirect(url_for('home'))
+    # ---------------------------------
 
     try:
         img = Image.open("certificate.jpg").convert("RGB")
