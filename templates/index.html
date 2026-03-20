@@ -11,6 +11,19 @@
 <body>
 
     <div class="glass-container">
+        
+        <!-- FLASHED ERROR MESSAGES START -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert-box {{ category }}">
+                <i class="fas fa-exclamation-triangle"></i> {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <!-- FLASHED ERROR MESSAGES END -->
+
         <div class="header">
            <img src="{{ url_for('static', filename='logo.png') }}" alt="LUCU Logo" class="cu-logo">
             <h1>LUCU CLASS OF 2025/2026</h1>
@@ -18,11 +31,21 @@
         </div>
 
         <form action="/generate" method="POST" class="cert-form" id="mainForm">
+            <!-- 1. RECIPIENT NAME -->
             <div class="input-group">
                 <label for="student_name">Recipient Name</label>
                 <div class="inner-input">
                     <i class="fas fa-user"></i>
                     <input type="text" id="student_name" name="student_name" placeholder="Full Name" required>
+                </div>
+            </div>
+
+            <!-- 2. ADMISSION NUMBER -->
+            <div class="input-group">
+                <label for="adm_no">Admission Number</label>
+                <div class="inner-input">
+                    <i class="fas fa-id-card"></i>
+                    <input type="text" id="adm_no" name="adm_no" placeholder="e.g. BCT/001/2021" required>
                 </div>
             </div>
 
@@ -33,6 +56,7 @@
         </form>
     </div>
 
+    <!-- PREVIEW MODAL -->
     <div id="previewModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -43,8 +67,13 @@
                     <small>Full Name:</small>
                     <p id="previewName"></p>
                 </div>
+
+                <div class="preview-item">
+                    <small>Admission Number:</small>
+                    <p id="previewAdm"></p>
+                </div>
                 
-                <p class="notice">Please ensure the spelling is correct. Changes cannot be made after generation.</p>
+                <p class="notice">Only 2021 and 2022 intake years are eligible. Please ensure the details are correct.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" onclick="closePreview()" class="btn-secondary">

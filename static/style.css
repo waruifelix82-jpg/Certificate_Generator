@@ -1,68 +1,132 @@
 /* --- YOUR ORIGINAL THEME --- */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Poppins', sans-serif; /* Updated to match your Google Font */
     background-color: #f4f7f6;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
 }
 
 .glass-container {
     background-color: white;
     padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     text-align: center;
-    width: 350px;
+    width: 380px; /* Slightly wider for better spacing */
 }
 
-h2, h1 {
+/* --- NEW: ALERT BOX FOR ERRORS --- */
+.alert-box {
+    background-color: rgba(231, 76, 60, 0.1); /* Soft red background */
+    border-left: 5px solid #e74c3c;
+    color: #c0392b;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: left;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- FORM STYLING --- */
+h1 {
     color: #2c3e50;
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+}
+
+.header p {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+}
+
+.input-group {
+    text-align: left;
     margin-bottom: 1.5rem;
 }
 
-input {
+.input-group label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #34495e;
+    margin-bottom: 5px;
+}
+
+.inner-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.inner-input i {
+    position: absolute;
+    left: 12px;
+    color: #95a5a6;
+}
+
+.inner-input input {
     width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-sizing: border-box;
+    padding: 12px 12px 12px 40px; /* Space for the icon */
+    margin: 0;
+    border: 1px solid #dfe6e9;
+    border-radius: 8px;
+    transition: border 0.3s;
+}
+
+input:focus {
+    outline: none;
+    border-color: #6b02fd;
 }
 
 button {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     background-color: #6b02fd;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
-    transition: background 0.3s;
+    font-weight: 600;
+    transition: all 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
 }
 
 button:hover {
-    background-color: #3979c2;
+    background-color: #5501cc;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(107, 2, 253, 0.3);
 }
 
 /* --- THE MODAL (PREVIEW POP-UP) STYLES --- */
-
 .modal {
-    display: none; /* Hidden by default */
+    display: none;
     position: fixed;
-    z-index: 9999; /* Stay on top of everything */
+    z-index: 9999;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.6); /* Darkens the background */
-    backdrop-filter: blur(4px); /* Modern blur effect */
+    background-color: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
     justify-content: center;
     align-items: center;
-    animation: fadeIn 0.3s ease;
 }
 
 .modal-content {
@@ -72,15 +136,13 @@ button:hover {
     width: 90%;
     max-width: 400px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    text-align: left;
 }
 
-/* Preview Area inside Modal */
 .preview-body {
     margin: 20px 0;
     padding: 15px;
     background: #f8f9fa;
-    border-left: 5px solid #4f04fe;
+    border-left: 5px solid #6b02fd;
     border-radius: 5px;
 }
 
@@ -94,9 +156,17 @@ button:hover {
 
 .preview-item p {
     margin: 5px 0 15px 0;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: #2c3e50;
+}
+
+.notice {
+    font-size: 0.8rem;
+    color: #e67e22;
+    background: #fff3e0;
+    padding: 10px;
+    border-radius: 5px;
 }
 
 .modal-footer {
@@ -104,45 +174,12 @@ button:hover {
     gap: 10px;
 }
 
-/* Specific buttons for the modal */
-.btn-secondary {
-    background-color: #95a5a6;
-    flex: 1;
-}
+.btn-secondary { background-color: #95a5a6; flex: 1; }
+.btn-confirm { background-color: #6b02fd; flex: 2; }
 
-.btn-confirm {
-    background-color: #7c02ff;
-    flex: 2;
-}
-
-/* --- STATES & ANIMATIONS --- */
-
-button:disabled {
-    cursor: not-allowed;
-    background-color: #bdc3c7;
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.7; }
-    100% { opacity: 1; }
-}
-/* Styling for your new Logo */
+/* --- LOGO STYLING --- */
 .cu-logo {
-    width: 100px;         /* Adjust this size as needed */
-    height: auto;        /* Keeps the proportions correct */
-    margin-bottom: 15px; /* Space between logo and text */
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); /* Optional: adds a soft shadow */
-}
-
-/* Optional: If your logo is circular, add this */
-.cu-logo-circular {
-    border-radius: 50%;
-    border: 3px solid #3027ae;
-}
+    width: 80px;
+    height: auto;
+    margin-bottom: 10px;
+    filter
