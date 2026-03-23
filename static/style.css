@@ -1,6 +1,6 @@
-/* --- YOUR ORIGINAL THEME --- */
+/* --- GLOBAL THEME --- */
 body {
-    font-family: 'Poppins', sans-serif; /* Updated to match your Google Font */
+    font-family: 'Poppins', sans-serif;
     background-color: #f4f7f6;
     display: flex;
     justify-content: center;
@@ -11,16 +11,56 @@ body {
 
 .glass-container {
     background-color: white;
-    padding: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
     text-align: center;
-    width: 380px; /* Slightly wider for better spacing */
+    width: 380px; 
 }
 
-/* --- NEW: ALERT BOX FOR ERRORS --- */
+/* --- LOGO STYLING --- */
+.cu-logo {
+    width: 80px;
+    height: auto;
+    margin: 0 auto 15px auto;
+    display: block;
+}
+
+/* --- ADVISING BOARD (NOTICE BOX) --- */
+.notice-box {
+    background-color: #f0f7ff;
+    border-left: 4px solid #6b02fd;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    text-align: left;
+}
+
+.notice-box i {
+    color: #6b02fd;
+    font-size: 1.1rem;
+    margin-top: 2px;
+}
+
+.notice-box p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #475569;
+    line-height: 1.5;
+}
+
+.notice-box strong {
+    color: #1e293b;
+    display: block;
+    margin-bottom: 2px;
+}
+
+/* --- ALERT BOXES (Errors) --- */
 .alert-box {
-    background-color: rgba(231, 76, 60, 0.1); /* Soft red background */
+    background-color: rgba(231, 76, 60, 0.1);
     border-left: 5px solid #e74c3c;
     color: #c0392b;
     padding: 12px;
@@ -55,6 +95,7 @@ h1 {
 .input-group {
     text-align: left;
     margin-bottom: 1.5rem;
+    position: relative; /* Required for search dropdown */
 }
 
 .input-group label {
@@ -75,12 +116,12 @@ h1 {
     position: absolute;
     left: 12px;
     color: #95a5a6;
+    z-index: 5;
 }
 
 .inner-input input {
     width: 100%;
-    padding: 12px 12px 12px 40px; /* Space for the icon */
-    margin: 0;
+    padding: 12px 12px 12px 40px;
     border: 1px solid #dfe6e9;
     border-radius: 8px;
     transition: border 0.3s;
@@ -91,6 +132,41 @@ input:focus {
     border-color: #6b02fd;
 }
 
+/* --- AUTOCOMPLETE DROPDOWN --- */
+.autocomplete-items {
+    position: absolute;
+    border: 1px solid #dfe6e9;
+    border-top: none;
+    z-index: 99;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    border-radius: 0 0 10px 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.autocomplete-items div {
+    padding: 12px 15px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #f8f9fa;
+    text-align: left;
+}
+
+.autocomplete-items div:hover {
+    background-color: #f4f7f6;
+    color: #6b02fd;
+}
+
+.autocomplete-active {
+    background-color: #6b02fd !important;
+    color: #ffffff !important;
+}
+
+/* --- BUTTONS --- */
 button {
     width: 100%;
     padding: 14px;
@@ -114,7 +190,7 @@ button:hover {
     box-shadow: 0 5px 15px rgba(107, 2, 253, 0.3);
 }
 
-/* --- THE MODAL (PREVIEW POP-UP) STYLES --- */
+/* --- MODAL STYLES --- */
 .modal {
     display: none;
     position: fixed;
@@ -144,14 +220,7 @@ button:hover {
     background: #f8f9fa;
     border-left: 5px solid #6b02fd;
     border-radius: 5px;
-}
-
-.preview-item small {
-    display: block;
-    font-size: 11px;
-    color: #7f8c8d;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    text-align: left;
 }
 
 .preview-item p {
@@ -161,26 +230,10 @@ button:hover {
     color: #2c3e50;
 }
 
-.notice {
-    font-size: 0.8rem;
-    color: #e67e22;
-    background: #fff3e0;
-    padding: 10px;
-    border-radius: 5px;
-}
-
 .modal-footer {
     display: flex;
     gap: 10px;
 }
 
 .btn-secondary { background-color: #95a5a6; flex: 1; }
-.btn-confirm { background-color: #6b02fd; flex: 2; }
-
-/* --- LOGO STYLING --- */
-.cu-logo {
-    width: 80px;
-    height: auto;
-    margin-bottom: 10px;
-    }
-    
+.btn-confirm { background-color: #27ae60; flex: 2; }
