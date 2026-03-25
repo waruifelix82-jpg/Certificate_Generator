@@ -95,7 +95,7 @@ h1 {
 .input-group {
     text-align: left;
     margin-bottom: 1.5rem;
-    position: relative; /* Required for search dropdown */
+    position: relative; 
 }
 
 .input-group label {
@@ -119,17 +119,41 @@ h1 {
     z-index: 5;
 }
 
-.inner-input input {
+/* Combined styling for Inputs and Selects */
+.inner-input input,
+.inner-input select {
     width: 100%;
     padding: 12px 12px 12px 40px;
     border: 1px solid #dfe6e9;
     border-radius: 8px;
-    transition: border 0.3s;
+    transition: all 0.3s;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    background-color: white;
 }
 
-input:focus {
+/* Specific Dropdown Arrow for the Select Ministry field */
+.inner-input select {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+}
+
+/* Icon for the dropdown arrow */
+.input-group:has(select) .inner-input::after {
+    content: '\f107';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 15px;
+    color: #95a5a6;
+    pointer-events: none;
+}
+
+input:focus, select:focus {
     outline: none;
     border-color: #6b02fd;
+    box-shadow: 0 0 0 3px rgba(107, 2, 253, 0.1);
 }
 
 /* --- AUTOCOMPLETE DROPDOWN --- */
@@ -223,11 +247,25 @@ button:hover {
     text-align: left;
 }
 
+.preview-item small {
+    display: block;
+    font-size: 0.75rem;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
 .preview-item p {
-    margin: 5px 0 15px 0;
+    margin: 0 0 15px 0;
     font-size: 1.1rem;
     font-weight: 600;
     color: #2c3e50;
+}
+
+/* Highlight the Ministry color in the preview */
+#previewMinistry {
+    color: #6b02fd;
 }
 
 .modal-footer {

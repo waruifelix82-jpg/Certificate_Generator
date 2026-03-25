@@ -12,7 +12,6 @@
 
     <div class="glass-container">
         
-        <!-- FLASHED ERROR MESSAGES START -->
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             {% for category, message in messages %}
@@ -22,25 +21,37 @@
             {% endfor %}
           {% endif %}
         {% endwith %}
-        <!-- FLASHED ERROR MESSAGES END -->
 
         <div class="header">
            <img src="{{ url_for('static', filename='logo.png') }}" alt="LUCU Logo" class="cu-logo">
-            <h1>LUCU CLASS OF 2025/2026</h1>
-            <p>Enter your details to generate your certificate</p>
+            <h1>LUCU MINISTRY PORTAL</h1>
+            <p>Select your department and enter details to generate your certificate</p>
         </div>
 
         <form action="/generate" method="POST" class="cert-form" id="mainForm">
-            <!-- 1. RECIPIENT NAME -->
+            
+            <div class="input-group">
+                <label for="ministry">Ministry / Department</label>
+                <div class="inner-input">
+                    <i class="fas fa-users"></i>
+                    <select id="ministry" name="ministry" required>
+                        <option value="" disabled selected>Select your Ministry...</option>
+                        <option value="Forth Years">Whole CU (4th Years)</option>
+                        <option value="Network Evangelistic">Network Evangelistic</option>
+                        <option value="Publicity and Media">Publicity and Media Ministry</option>
+                        <option value="Creative Ministry">Creative Ministry</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="input-group">
                 <label for="student_name">Recipient Name</label>
                 <div class="inner-input">
                     <i class="fas fa-user"></i>
-                    <input type="text" id="student_name" name="student_name" placeholder="Full Name" required>
+                    <input type="text" id="student_name" name="student_name" placeholder="Full Name (as it appears on ID)" required>
                 </div>
             </div>
 
-            <!-- 2. ADMISSION NUMBER -->
             <div class="input-group">
                 <label for="adm_no">Admission Number</label>
                 <div class="inner-input">
@@ -56,13 +67,17 @@
         </form>
     </div>
 
-    <!-- PREVIEW MODAL -->
     <div id="previewModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3><i class="fas fa-check-circle"></i> Confirm Details</h3>
             </div>
             <div class="preview-body">
+                <div class="preview-item">
+                    <small>Selected Ministry:</small>
+                    <p id="previewMinistry" style="font-weight: 600; color: #6b02fd;"></p>
+                </div>
+
                 <div class="preview-item">
                     <small>Full Name:</small>
                     <p id="previewName"></p>
@@ -73,7 +88,7 @@
                     <p id="previewAdm"></p>
                 </div>
                 
-                <p class="notice">Only 2021 and 2022 intake years are eligible. Please ensure the details are correct.</p>
+                <p class="notice">Please ensure you have selected the correct ministry. Certificates cannot be changed once generated.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" onclick="closePreview()" class="btn-secondary">

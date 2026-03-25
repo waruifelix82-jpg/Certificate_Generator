@@ -2,19 +2,35 @@ from flask import Flask, render_template, request, send_file, flash, redirect, u
 import os
 import io 
 import csv 
+import datetime 
 from PIL import Image, ImageDraw, ImageFont
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = "lucu_secret_key_2026"
 
-def is_student_registered(input_name):
+def is_student_registered(input_name, selected_ministry):
     try:
         with open('registered_students.csv', mode='r', encoding='utf-8') as file:
             reader = csv.DictReader(file)
-            registered_names = [row['name'].strip().upper() for row in reader]
-            return input_name.strip().upper() in registered_names
+            for row in reader:
+                if (row['name'].strip().upper() == input_name.strip().upper() and 
+                    row['category'].strip() == selected_ministry):
+                    return True
+            return False
     except FileNotFoundError:
         return False
+
+@app.route("/admin/lucu_admin_2026")
+def admin_dashboard():
+    downloads = []
+    try:
+        if os.path.exists('downloads.csv'):
+            with open('downloads.csv', mode='r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                downloads = list(reader)
+    except Exception as e:
+        flash(f"Admin Error: {e}", "error")
+    return render_template("admin.html", downloads=downloads)
 
 @app.route("/")
 def home():
@@ -24,13 +40,15 @@ def home():
 def generate():
     name = request.form.get("student_name")
     adm_no = request.form.get("adm_no") 
+    ministry = request.form.get("ministry") 
     
-    if not name or not adm_no:
-        flash("Error: Name and Admission Number are required!", "error")
+    if not name or not adm_no or not ministry:
+        flash("Error: All fields are required!", "error")
         return redirect(url_for('home'))
     
-    if not is_student_registered(name):
-        flash("Registration Error: Your name was not found on the Elders list.", "error")
+    # FIXED: Calling the function correctly
+    def is_student_registered(input_name, selected_ministry):
+        flash(f"Registration Error: {name} not found in {ministry}.", "error")
         return redirect(url_for('home'))
 
     if request.cookies.get(f"done_{name.replace(' ', '_')}"):
@@ -43,29 +61,43 @@ def generate():
         return redirect(url_for('home'))
 
     try:
-        # Load background - Must convert to RGBA to handle transparent signatures
-        img = Image.open("certificate.jpg").convert("RGBA")
+        # --- ASSET CONFIGURATION ---
+        configs = {
+            "Forth Years": {
+                "bg": "certificate_forth_years.jpg",
+                "sig_p": "sig_pm.png",
+                "sig_c": "sig_chair.png",
+                "name_y": 0.39,   # Original position
+                "sig_y": 0.72     # Original signature height
+            },
+            "Network Evangelistic": {
+                "bg": "certificate_network.jpg",
+                "sig_p": "sig_pm_network.png",
+                "sig_c": "sig_chair_network.png",
+                "name_y": 0.49,   # TOUCHES THE LINE for Network
+                "sig_y": 0.75     # Adjusts signatures for Network layout
+            }
+        }
+
+        cfg = configs.get(ministry, configs["Forth Years"])
+
+        img = Image.open(cfg["bg"]).convert("RGBA")
         W, H = img.size
         draw = ImageDraw.Draw(img)
         
-        # --- NEW: SIGNATURE SECTION ---
-        # Load the signature files from the static folder
         try:
-            sig_pm = Image.open(os.path.join("static", "sig_pm.png")).convert("RGBA")
-            sig_chair = Image.open(os.path.join("static", "sig_chair.png")).convert("RGBA")
-
-            # Resize signatures to fit the lines (adjust these numbers if needed)
+            sig_pm = Image.open(os.path.join("static", cfg["sig_p"])).convert("RGBA")
+            sig_chair = Image.open(os.path.join("static", cfg["sig_c"])).convert("RGBA")
+            
             sig_pm = sig_pm.resize((int(W * 0.15), int(H * 0.08)))
             sig_chair = sig_chair.resize((int(W * 0.15), int(H * 0.08)))
-
-            # Paste signatures onto the certificate
-            # Coordinates based on your template: PM (Left), Chairperson (Right)
-            img.paste(sig_pm, (int(W * 0.15), int(H * 0.72)), sig_pm) 
-            img.paste(sig_chair, (int(W * 0.68), int(H * 0.72)), sig_chair)
+            
+            # Using dynamic sig_y from config
+            img.paste(sig_pm, (int(W * 0.15), int(H * cfg["sig_y"])), sig_pm) 
+            img.paste(sig_chair, (int(W * 0.68), int(H * cfg["sig_y"])), sig_chair)
         except FileNotFoundError:
-            print("Signature files not found in static folder. Skipping signatures.")
+            print(f"Signature files for {ministry} not found.")
 
-        # --- TEXT SECTION (Original Logic) ---
         name_size = int(W * 0.04) 
         font_paths = ["arial.ttf", "Poppins-Bold.ttf", 
                       "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
@@ -82,10 +114,22 @@ def generate():
             font_name = ImageFont.load_default()
 
         center_x = W // 2
-        name_y = int(H * 0.39) 
+        # Using dynamic name_y from config to ensure it touches the line
+        name_y = int(H * cfg["name_y"]) 
         draw.text((center_x, name_y), name.upper(), fill=(0, 51, 153), font=font_name, anchor="mm")
 
-        # Convert back to RGB to save as JPEG
+        # --- LOG DOWNLOAD ---
+        try:
+            log_file = 'downloads.csv'
+            file_exists = os.path.isfile(log_file)
+            with open(log_file, mode='a', encoding='utf-8', newline='') as f:
+                writer = csv.writer(f)
+                if not file_exists:
+                    writer.writerow(['Timestamp', 'Name', 'Admission_No', 'Ministry'])
+                writer.writerow([datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), name.upper(), adm_no, ministry])
+        except Exception as e:
+            print(f"Logging failed: {e}")
+
         final_img = img.convert("RGB")
         img_io = io.BytesIO()
         final_img.save(img_io, 'JPEG', quality=100)

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>LUCU Admin - Download Logs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .admin-table th, .admin-table td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        .admin-table th { background-color: #6b02fd; color: white; }
+        .stats { font-weight: bold; color: #6b02fd; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="glass-container" style="width: 80%; max-width: 800px;">
+        <h1>Download Dashboard</h1>
+        <p class="stats">Total Certificates Issued: {{ downloads|length }}</p>
+        
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Date/Time</th>
+                    <th>Elder Name</th>
+                    <th>Admission No</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in downloads|reverse %}
+                <tr>
+                    <td>{{ log.Timestamp }}</td>
+                    <td>{{ log.Name }}</td>
+                    <td>{{ log.Admission_No }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <a href="/" style="color: #6b02fd;">← Back to Portal</a>
+    </div>
+</body>
+</html>
