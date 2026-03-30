@@ -62,20 +62,36 @@ def generate():
 
     try:
         # --- ASSET CONFIGURATION ---
+        # --- ASSET CONFIGURATION ---
         configs = {
             "Forth Years": {
                 "bg": "certificate_forth_years.jpg",
                 "sig_p": "sig_pm.png",
                 "sig_c": "sig_chair.png",
-                "name_y": 0.39,   # Original position
-                "sig_y": 0.72     # Original signature height
+                "name_y": 0.39,   
+                "sig_y": 0.72     
             },
             "Network Evangelistic": {
                 "bg": "certificate_network.jpg",
                 "sig_p": "sig_pm_network.png",
                 "sig_c": "sig_chair_network.png",
-                "name_y": 0.49,   # TOUCHES THE LINE for Network
-                "sig_y": 0.75     # Adjusts signatures for Network layout
+                "name_y": 0.49,   
+                "sig_y": 0.75     
+            },
+            # Ensure "Publicity and Media" matches your HTML <option value="..."> exactly
+            "Publicity and Media": {
+                "bg": "certificate_pm.jpg", # Make sure this file exists in your main folder!
+                "sig_p": "sig_pm.png", 
+                "sig_c": "sig_chair.png",
+                "name_y": 0.53,   
+                "sig_y": 0.75     
+            },
+            "Creative Ministry": {
+                "bg": "certificate_creative.jpg",
+                "sig_p": "sig_pm.png", 
+                "sig_c": "sig_chair.png",
+                "name_y": 0.58,   
+                "sig_y": 0.75   
             }
         }
 
