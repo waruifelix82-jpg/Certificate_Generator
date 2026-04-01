@@ -9,15 +9,54 @@ app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = "lucu_secret_key_2026"
 
 def is_student_registered(input_name, selected_ministry):
+    # Mapping ministries to their specific files
+    if "Network" in selected_ministry:
+        filename = 'registered_et.csv'
+    elif "Creative" in selected_ministry:
+        filename = 'registered_creative.csv'
+    elif "Publicity" in selected_ministry:
+        filename = 'registered_publicity.csv'
+    else:
+        filename = 'registered_students.csv' # Default for Forth Years
+    
+    # ... rest of your search logic stays the same ...
+    
+    if not os.path.exists(filename):
+        print(f"!!! ERROR: {filename} NOT FOUND")
+        return False
+
     try:
-        with open('registered_students.csv', mode='r', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
+        with open(filename, mode='r', encoding='utf-8-sig') as file:
+            # We use a standard reader first to check the raw content
+            reader = csv.reader(file)
+            headers = [h.lower().strip() for h in next(reader)]
+            
+            # Find which column index contains the name
+            name_index = -1
+            if 'name' in headers:
+                name_index = headers.index('name')
+            else:
+                # If 'name' isn't found, assume the first column (index 0) is the name
+                name_index = 0
+            
+            # Clean the user input: Remove extra spaces inside the name too
+            user_input = " ".join(input_name.strip().upper().split())
+            
             for row in reader:
-                if (row['name'].strip().upper() == input_name.strip().upper() and 
-                    row['category'].strip() == selected_ministry):
+                if not row: continue # Skip empty lines
+                
+                # Get the name from the correct column and clean it
+                raw_csv_name = row[name_index]
+                csv_name = " ".join(raw_csv_name.strip().upper().split())
+                
+                if csv_name == user_input:
+                    print(f"SUCCESS: Found {csv_name} in {filename}")
                     return True
+            
+            print(f"FAILED: '{user_input}' not found in {filename}")
             return False
-    except FileNotFoundError:
+    except Exception as e:
+        print(f"CSV ERROR in {filename}: {e}")
         return False
 
 @app.route("/admin/lucu_admin_2026")
@@ -46,23 +85,24 @@ def generate():
         flash("Error: All fields are required!", "error")
         return redirect(url_for('home'))
     
-    # FIXED: Calling the function correctly
-    def is_student_registered(input_name, selected_ministry):
-        flash(f"Registration Error: {name} not found in {ministry}.", "error")
+    # 1. Validation: Is the person in the specific CSV for that ministry?
+    if not is_student_registered(name, ministry):
+        flash(f"Error: {name} is not registered under {ministry}.", "error")
         return redirect(url_for('home'))
 
+    # 2. Cookie check to prevent multiple downloads
     if request.cookies.get(f"done_{name.replace(' ', '_')}"):
         flash("System Note: You have already downloaded the certificate.", "error")
         return redirect(url_for('home'))
 
+    # 3. Admission Year Check (2021/2022)
     clean_adm = adm_no.strip()
     if not (clean_adm.endswith("21") or clean_adm.endswith("22")):
-        flash("Registration Error: Only forth years are eligible.", "error")
+        flash("Registration Error: Only fourth years are eligible.", "error")
         return redirect(url_for('home'))
 
     try:
-        # --- ASSET CONFIGURATION ---
-        # --- ASSET CONFIGURATION ---
+        # ASSET CONFIGURATION
         configs = {
             "Forth Years": {
                 "bg": "certificate_forth_years.jpg",
@@ -78,9 +118,8 @@ def generate():
                 "name_y": 0.49,   
                 "sig_y": 0.75     
             },
-            # Ensure "Publicity and Media" matches your HTML <option value="..."> exactly
             "Publicity and Media": {
-                "bg": "certificate_pm.jpg", # Make sure this file exists in your main folder!
+                "bg": "certificate_pm.jpg",
                 "sig_p": "sig_pm.png", 
                 "sig_c": "sig_chair.png",
                 "name_y": 0.53,   
@@ -90,8 +129,8 @@ def generate():
                 "bg": "certificate_creative.jpg",
                 "sig_p": "sig_pm.png", 
                 "sig_c": "sig_chair.png",
-                "name_y": 0.58,   
-                "sig_y": 0.75   
+                "name_y": 0.57,   
+                "sig_y": 0.64 
             }
         }
 
@@ -101,19 +140,20 @@ def generate():
         W, H = img.size
         draw = ImageDraw.Draw(img)
         
+        # Draw Signatures
         try:
-            sig_pm = Image.open(os.path.join("static", cfg["sig_p"])).convert("RGBA")
-            sig_chair = Image.open(os.path.join("static", cfg["sig_c"])).convert("RGBA")
-            
+            sig_pm_path = os.path.join("static", cfg["sig_p"])
+            sig_chair_path = os.path.join("static", cfg["sig_c"])
+            sig_pm = Image.open(sig_pm_path).convert("RGBA")
+            sig_chair = Image.open(sig_chair_path).convert("RGBA")
             sig_pm = sig_pm.resize((int(W * 0.15), int(H * 0.08)))
             sig_chair = sig_chair.resize((int(W * 0.15), int(H * 0.08)))
-            
-            # Using dynamic sig_y from config
             img.paste(sig_pm, (int(W * 0.15), int(H * cfg["sig_y"])), sig_pm) 
             img.paste(sig_chair, (int(W * 0.68), int(H * cfg["sig_y"])), sig_chair)
-        except FileNotFoundError:
-            print(f"Signature files for {ministry} not found.")
+        except Exception as e:
+            print(f"Signature error: {e}")
 
+        # Font logic
         name_size = int(W * 0.04) 
         font_paths = ["arial.ttf", "Poppins-Bold.ttf", 
                       "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
@@ -129,23 +169,20 @@ def generate():
         if font_name is None:
             font_name = ImageFont.load_default()
 
-        center_x = W // 2
-        # Using dynamic name_y from config to ensure it touches the line
+        # Draw Name
         name_y = int(H * cfg["name_y"]) 
-        draw.text((center_x, name_y), name.upper(), fill=(0, 51, 153), font=font_name, anchor="mm")
+        draw.text((W // 2, name_y), name.upper(), fill=(0, 51, 153), font=font_name, anchor="mm")
 
-        # --- LOG DOWNLOAD ---
-        try:
-            log_file = 'downloads.csv'
-            file_exists = os.path.isfile(log_file)
-            with open(log_file, mode='a', encoding='utf-8', newline='') as f:
-                writer = csv.writer(f)
-                if not file_exists:
-                    writer.writerow(['Timestamp', 'Name', 'Admission_No', 'Ministry'])
-                writer.writerow([datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), name.upper(), adm_no, ministry])
-        except Exception as e:
-            print(f"Logging failed: {e}")
+        # Save record
+        log_file = 'downloads.csv'
+        file_exists = os.path.isfile(log_file)
+        with open(log_file, mode='a', encoding='utf-8', newline='') as f:
+            writer = csv.writer(f)
+            if not file_exists:
+                writer.writerow(['Timestamp', 'Name', 'Admission_No', 'Ministry'])
+            writer.writerow([datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), name.upper(), adm_no, ministry])
 
+        # Serve Image
         final_img = img.convert("RGB")
         img_io = io.BytesIO()
         final_img.save(img_io, 'JPEG', quality=100)
