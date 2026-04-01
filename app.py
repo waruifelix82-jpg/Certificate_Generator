@@ -19,33 +19,26 @@ def is_student_registered(input_name, selected_ministry):
     else:
         filename = 'registered_students.csv' # Default for Forth Years
     
-    # ... rest of your search logic stays the same ...
-    
     if not os.path.exists(filename):
         print(f"!!! ERROR: {filename} NOT FOUND")
         return False
 
     try:
         with open(filename, mode='r', encoding='utf-8-sig') as file:
-            # We use a standard reader first to check the raw content
             reader = csv.reader(file)
             headers = [h.lower().strip() for h in next(reader)]
             
-            # Find which column index contains the name
             name_index = -1
             if 'name' in headers:
                 name_index = headers.index('name')
             else:
-                # If 'name' isn't found, assume the first column (index 0) is the name
                 name_index = 0
             
-            # Clean the user input: Remove extra spaces inside the name too
             user_input = " ".join(input_name.strip().upper().split())
             
             for row in reader:
-                if not row: continue # Skip empty lines
+                if not row: continue 
                 
-                # Get the name from the correct column and clean it
                 raw_csv_name = row[name_index]
                 csv_name = " ".join(raw_csv_name.strip().upper().split())
                 
@@ -62,13 +55,7 @@ def is_student_registered(input_name, selected_ministry):
 @app.route("/admin/lucu_admin_2026")
 def admin_dashboard():
     downloads = []
-    try:
-        if os.path.exists('downloads.csv'):
-            with open('downloads.csv', mode='r', encoding='utf-8') as f:
-                reader = csv.DictReader(f)
-                downloads = list(reader)
-    except Exception as e:
-        flash(f"Admin Error: {e}", "error")
+    # Admin dashboard will remain empty on Vercel as downloads.csv cannot be updated
     return render_template("admin.html", downloads=downloads)
 
 @app.route("/")
@@ -85,24 +72,20 @@ def generate():
         flash("Error: All fields are required!", "error")
         return redirect(url_for('home'))
     
-    # 1. Validation: Is the person in the specific CSV for that ministry?
     if not is_student_registered(name, ministry):
         flash(f"Error: {name} is not registered under {ministry}.", "error")
         return redirect(url_for('home'))
 
-    # 2. Cookie check to prevent multiple downloads
     if request.cookies.get(f"done_{name.replace(' ', '_')}"):
         flash("System Note: You have already downloaded the certificate.", "error")
         return redirect(url_for('home'))
 
-    # 3. Admission Year Check (2021/2022)
     clean_adm = adm_no.strip()
     if not (clean_adm.endswith("21") or clean_adm.endswith("22")):
         flash("Registration Error: Only fourth years are eligible.", "error")
         return redirect(url_for('home'))
 
     try:
-        # ASSET CONFIGURATION
         configs = {
             "Forth Years": {
                 "bg": "certificate_forth_years.jpg",
@@ -130,7 +113,7 @@ def generate():
                 "sig_p": "sig_pm.png", 
                 "sig_c": "sig_chair.png",
                 "name_y": 0.57,   
-                "sig_y": 0.64 
+                "sig_y": 0.67
             }
         }
 
@@ -140,7 +123,6 @@ def generate():
         W, H = img.size
         draw = ImageDraw.Draw(img)
         
-        # Draw Signatures
         try:
             sig_pm_path = os.path.join("static", cfg["sig_p"])
             sig_chair_path = os.path.join("static", cfg["sig_c"])
@@ -153,7 +135,6 @@ def generate():
         except Exception as e:
             print(f"Signature error: {e}")
 
-        # Font logic
         name_size = int(W * 0.04) 
         font_paths = ["arial.ttf", "Poppins-Bold.ttf", 
                       "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
@@ -169,20 +150,18 @@ def generate():
         if font_name is None:
             font_name = ImageFont.load_default()
 
-        # Draw Name
         name_y = int(H * cfg["name_y"]) 
         draw.text((W // 2, name_y), name.upper(), fill=(0, 51, 153), font=font_name, anchor="mm")
 
-        # Save record
-        log_file = 'downloads.csv'
-        file_exists = os.path.isfile(log_file)
-        with open(log_file, mode='a', encoding='utf-8', newline='') as f:
-            writer = csv.writer(f)
-            if not file_exists:
-                writer.writerow(['Timestamp', 'Name', 'Admission_No', 'Ministry'])
-            writer.writerow([datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), name.upper(), adm_no, ministry])
+        # --- CSV LOGGING DISABLED FOR VERCEL COMPATIBILITY ---
+        # log_file = 'downloads.csv'
+        # file_exists = os.path.isfile(log_file)
+        # with open(log_file, mode='a', encoding='utf-8', newline='') as f:
+        #     writer = csv.writer(f)
+        #     if not file_exists:
+        #         writer.writerow(['Timestamp', 'Name', 'Admission_No', 'Ministry'])
+        #     writer.writerow([datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), name.upper(), adm_no, ministry])
 
-        # Serve Image
         final_img = img.convert("RGB")
         img_io = io.BytesIO()
         final_img.save(img_io, 'JPEG', quality=100)
